@@ -29,6 +29,8 @@ else
 
 ## API Reference
 
+Full API documentation: <https://scanii.github.io/openapi/v22/>
+
 All methods are on `IScaniiClient`, created via `ScaniiClients.CreateDefault`.
 
 | Method | Description |
