@@ -157,7 +157,7 @@ namespace Scanii.Internal
 
       CheckForErrors(response);
 
-      if (response.StatusCode == HttpStatusCode.Created || response.StatusCode == HttpStatusCode.OK)
+      if (response.StatusCode == HttpStatusCode.Created)
         return DecorateEntity(
           await JsonSerializer.DeserializeAsync<ScaniiAuthToken>(await response.Content.ReadAsStreamAsync()),
           response);
