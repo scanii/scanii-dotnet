@@ -1,4 +1,4 @@
-﻿namespace UvaSoftware.Scanii.Entities
+﻿namespace Scanii.Models
 {
   public class ScaniiResult
   {

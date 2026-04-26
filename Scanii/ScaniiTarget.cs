@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace UvaSoftware.Scanii
+// ReSharper disable MemberCanBePrivate.Global
+
+namespace Scanii
 {
   public class ScaniiTarget
   {
@@ -11,6 +13,7 @@ namespace UvaSoftware.Scanii
     public static readonly ScaniiTarget Eu2 = new ScaniiTarget("https://api-eu2.scanii.com");
     public static readonly ScaniiTarget Ap1 = new ScaniiTarget("https://api-ap1.scanii.com");
     public static readonly ScaniiTarget Ap2 = new ScaniiTarget("https://api-ap2.scanii.com");
+    public static readonly ScaniiTarget Ca1 = new ScaniiTarget("https://api-ca1.scanii.com");
 
     // ReSharper disable once MemberCanBePrivate.Global
     public ScaniiTarget(string endpoint)
@@ -24,7 +27,7 @@ namespace UvaSoftware.Scanii
     {
       return new List<ScaniiTarget>
       {
-        Auto, Ap1, Ap2, Us1, Eu1, Eu2
+        Auto, Ap1, Ap2, Us1, Eu1, Eu2, Ca1
       };
     }
   }

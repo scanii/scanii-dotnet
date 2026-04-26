@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>Scanii</PackageId>
+    <AssemblyName>Scanii</AssemblyName>
+    <RootNamespace>Scanii</RootNamespace>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!--always rev this up-->
+    <Version>7.0.0</Version>
+
+    <LangVersion>8</LangVersion>
+    <Company>Uva Software, LLC</Company>
+    <Authors>Uva Software Engineers</Authors>
+    <Description>.NET interface to the scanii.com content processing service</Description>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/scanii/scanii-dotnet</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/scanii/scanii-dotnet</PackageProjectUrl>
+    <Copyright>Uva Software, LLC</Copyright>
+    <PackageTags>scanii,client</PackageTags>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../LICENSE"/>
+    <None Include="../README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+</Project>
