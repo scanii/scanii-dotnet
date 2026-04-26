@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
-using UvaSoftware.Scanii.Entities;
+using Scanii.Models;
 
-namespace UvaSoftware.Scanii
+namespace Scanii
 {
   /// <summary>
   /// Interface for a Scanii API client
@@ -13,7 +13,7 @@ namespace UvaSoftware.Scanii
   public interface IScaniiClient
   {
     /// <summary>
-    ///   Submits a stream to be processed (http://docs.scanii.com/v2.2/resources.html#files)
+    ///   Submits a stream to be processed (https://scanii.github.io/openapi/v22/)
     /// </summary>
     /// <param name="contents">stream of the content to be analyzed</param>
     /// <param name="callback">optional location (URL) to be notified and receive the result</param>
@@ -24,7 +24,7 @@ namespace UvaSoftware.Scanii
       Dictionary<string, string> metadata = null);
 
     /// <summary>
-    ///   Submits a file to be processed (http://docs.scanii.com/v2.2/resources.html#files)
+    ///   Submits a file to be processed (https://scanii.github.io/openapi/v22/)
     /// </summary>
     /// <param name="path">file path on the local system</param>
     /// <param name="callback">optional location (URL) to be notified and receive the result</param>
@@ -35,55 +35,55 @@ namespace UvaSoftware.Scanii
       Dictionary<string, string> metadata = null);
 
     /// <summary>
-    ///   Submits a stream to be processed asynchronously (http://docs.scanii.com/v2.2/resources.html#files)
+    ///   Submits a stream to be processed asynchronously (https://scanii.github.io/openapi/v22/)
     /// </summary>
     /// <param name="contents">stream of the content to be analyzed</param>
-    /// <param name="metadata">optional metadata to be added to this analysis</param>
     /// <param name="callback">optional location (URL) to be notified and receive the result</param>
-    /// <returns>processing result</returns>
+    /// <param name="metadata">optional metadata to be added to this analysis</param>
+    /// <returns>pending result</returns>
     /// <exception cref="ScaniiException"></exception>
     Task<ScaniiPendingResult> ProcessAsync(Stream contents, string callback = null,
       Dictionary<string, string> metadata = null);
 
     /// <summary>
-    ///   Submits a file to be processed asynchronously (http://docs.scanii.com/v2.2/resources.html#files)
+    ///   Submits a file to be processed asynchronously (https://scanii.github.io/openapi/v22/)
     /// </summary>
     /// <param name="path">file path on the local system</param>
-    /// <param name="metadata">optional metadata to be added to this analysis</param>
     /// <param name="callback">optional location (URL) to be notified and receive the result</param>
-    /// <returns>processing result</returns>
+    /// <param name="metadata">optional metadata to be added to this analysis</param>
+    /// <returns>pending result</returns>
     /// <exception cref="ScaniiException"></exception>
     Task<ScaniiPendingResult> ProcessAsync(string path, string callback = null,
       Dictionary<string, string> metadata = null);
 
     /// <summary>
-    ///   Fetches the results of a previously processed file (http://docs.scanii.com/v2.2/resources.html#files)
+    ///   Fetches the results of a previously processed file (https://scanii.github.io/openapi/v22/)
     /// </summary>
     /// <param name="id">id of the content/file to be retrieved</param>
-    /// <returns>ScaniiResult</returns>
+    /// <returns>ScaniiProcessingResult</returns>
     /// <exception cref="ScaniiException"></exception>
     Task<ScaniiProcessingResult> Retrieve(string id);
 
     /// <summary>
-    ///   Pings the scanii service using the credentials provided (http://docs.scanii.com/v2.2/resources.html#ping)
+    ///   Pings the scanii service using the credentials provided (https://scanii.github.io/openapi/v22/)
     /// </summary>
     /// <returns>true if ping was successful, false otherwise</returns>
     /// <exception cref="ScaniiException"></exception>
     Task<bool> Ping();
 
     /// <summary>
-    ///   Makes a fetch call to scanii (http://docs.scanii.com/v2.2/resources.html#files)
+    ///   Makes a fetch call to scanii (https://scanii.github.io/openapi/v22/)
     /// </summary>
     /// <param name="location">location (URL) of the content to be processed</param>
     /// <param name="callback">optional location (URL) to be notified and receive the result</param>
     /// <param name="metadata">optional metadata to be added to this file</param>
-    /// <returns></returns>
+    /// <returns>pending result</returns>
     /// <exception cref="ScaniiException"></exception>
     Task<ScaniiPendingResult> Fetch(string location, string callback = null,
       Dictionary<string, string> metadata = null);
 
     /// <summary>
-    ///   Creates a new temporary authentication token (http://docs.scanii.com/v2.2/resources.html#auth-tokens)
+    ///   Creates a new temporary authentication token (https://scanii.github.io/openapi/v22/)
     /// </summary>
     /// <param name="timeoutInSeconds">How long the token should be valid for</param>
     /// <returns>the new auth token</returns>
@@ -101,7 +101,7 @@ namespace UvaSoftware.Scanii
     ///   Retrieves a previously created auth token
     /// </summary>
     /// <param name="id">the id of the token to be retrieved</param>
-    /// <returns></returns>
+    /// <returns>the auth token</returns>
     /// <exception cref="ScaniiException"></exception>
     Task<ScaniiAuthToken> RetrieveAuthToken(string id);
   }

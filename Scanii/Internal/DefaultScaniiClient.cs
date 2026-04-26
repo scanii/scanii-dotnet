@@ -1,28 +1,27 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using UvaSoftware.Scanii.Entities;
 using System.Text.Json;
+using System.Threading.Tasks;
+using Scanii.Models;
 
-namespace UvaSoftware.Scanii.Internal
+namespace Scanii.Internal
 {
   public class DefaultScaniiClient : IScaniiClient
   {
     private readonly HttpClient _httpClient;
-    private readonly ILogger _logger;
 
-    public DefaultScaniiClient(ScaniiTarget target, string key, string secret, ILogger logger, HttpClient httpClient)
+    public DefaultScaniiClient(ScaniiTarget target, string key, string secret, HttpClient httpClient)
     {
-      ValidateCredentials.Validate(key);
+      if (key == null) throw new ArgumentNullException(nameof(key));
+      if (key.Length == 0) throw new ArgumentException("API key cannot be the empty string.", nameof(key));
 
-      _logger = logger;
       _httpClient = httpClient;
       ConfigureClient(target, key, secret);
     }
@@ -38,15 +37,15 @@ namespace UvaSoftware.Scanii.Internal
 
       if (callback != null) formDataContent.Add(new StringContent(callback), "callback");
 
-      using var response = _httpClient.PostAsync("/v2.2/files", formDataContent).Result;
-      _logger.LogDebug("status code {Code}", response.StatusCode);
+      using var response = await _httpClient.PostAsync("/v2.2/files", formDataContent);
+      Trace.WriteLine($"[scanii] POST /v2.2/files status={response.StatusCode}");
+
+      CheckForErrors(response);
 
       if (response.StatusCode == HttpStatusCode.Created)
-      {
         return DecorateEntity(
           await JsonSerializer.DeserializeAsync<ScaniiProcessingResult>(await response.Content.ReadAsStreamAsync()),
           response);
-      }
 
       var responseBody = await response.Content.ReadAsStringAsync();
       throw new ScaniiException(
@@ -56,8 +55,7 @@ namespace UvaSoftware.Scanii.Internal
     public Task<ScaniiProcessingResult> Process(string path, string callback = null,
       Dictionary<string, string> metadata = null)
     {
-      using var stream = File.Open(path, FileMode.Open);
-      return Process(stream, callback, metadata);
+      return Process(new MemoryStream(File.ReadAllBytes(path)), callback, metadata);
     }
 
     public async Task<ScaniiPendingResult> ProcessAsync(Stream contents, string callback = null,
@@ -71,8 +69,10 @@ namespace UvaSoftware.Scanii.Internal
 
       if (callback != null) req.Add(new StringContent(callback), "callback");
 
-      using var response = _httpClient.PostAsync("/v2.2/files/async", req).Result;
-      _logger.LogDebug("status code {Code}", response.StatusCode);
+      using var response = await _httpClient.PostAsync("/v2.2/files/async", req);
+      Trace.WriteLine($"[scanii] POST /v2.2/files/async status={response.StatusCode}");
+
+      CheckForErrors(response);
 
       if (response.StatusCode == HttpStatusCode.Accepted)
         return DecorateEntity(
@@ -87,20 +87,24 @@ namespace UvaSoftware.Scanii.Internal
     public Task<ScaniiPendingResult> ProcessAsync(string path, string callback = null,
       Dictionary<string, string> metadata = null)
     {
-      using var stream = File.Open(path, FileMode.Open);
-      return ProcessAsync(stream, callback, metadata);
+      return ProcessAsync(new MemoryStream(File.ReadAllBytes(path)), callback, metadata);
     }
 
     public async Task<ScaniiProcessingResult> Retrieve(string id)
     {
       using var response = await _httpClient.GetAsync($"/v2.2/files/{id}");
 
+      CheckForErrors(response);
+
       if (response.StatusCode != HttpStatusCode.OK)
+      {
+        var responseBody = await response.Content.ReadAsStringAsync();
         throw new ScaniiException(
-          $"Invalid HTTP response from service, code: {response.StatusCode} message: {response.Content.ReadAsStringAsync()}");
+          $"Invalid HTTP response from service, code: {response.StatusCode} message: {responseBody}");
+      }
 
       var body = await response.Content.ReadAsStringAsync();
-      _logger.LogDebug("{Body}", body);
+      Trace.WriteLine($"[scanii] GET /v2.2/files/{id} body={body}");
       return DecorateEntity(
         JsonSerializer.Deserialize<ScaniiProcessingResult>(body),
         response);
@@ -111,7 +115,7 @@ namespace UvaSoftware.Scanii.Internal
       using var response = await _httpClient.GetAsync("/v2.2/ping");
       if (response.StatusCode != HttpStatusCode.OK)
         throw new ScaniiException(
-          $"Invalid HTTP response from service, code: {response.StatusCode}, message: {response.Content.ReadAsStringAsync()}");
+          $"Invalid HTTP response from service, code: {response.StatusCode}");
 
       return true;
     }
@@ -130,7 +134,9 @@ namespace UvaSoftware.Scanii.Internal
           parameters.Add($"metadata[{keyValuePair.Key}]", keyValuePair.Value);
 
       using var response = await _httpClient.PostAsync("/v2.2/files/fetch", new FormUrlEncodedContent(parameters));
-      _logger.LogDebug("status code {Code}", response.StatusCode);
+      Trace.WriteLine($"[scanii] POST /v2.2/files/fetch status={response.StatusCode}");
+
+      CheckForErrors(response);
 
       if (response.StatusCode == HttpStatusCode.Accepted)
         return DecorateEntity(
@@ -149,6 +155,8 @@ namespace UvaSoftware.Scanii.Internal
       var req = new FormUrlEncodedContent(parameters);
       using var response = await _httpClient.PostAsync("/v2.2/auth/tokens", req);
 
+      CheckForErrors(response);
+
       if (response.StatusCode == HttpStatusCode.Created)
         return DecorateEntity(
           await JsonSerializer.DeserializeAsync<ScaniiAuthToken>(await response.Content.ReadAsStreamAsync()),
@@ -161,8 +169,9 @@ namespace UvaSoftware.Scanii.Internal
 
     public async Task DeleteAuthToken(string id)
     {
-      _logger.LogInformation("deleting auth token {Token}", id);
       using var response = await _httpClient.DeleteAsync($"/v2.2/auth/tokens/{id}");
+
+      CheckForErrors(response);
 
       if (response.StatusCode == HttpStatusCode.NoContent) return;
 
@@ -174,13 +183,28 @@ namespace UvaSoftware.Scanii.Internal
     public async Task<ScaniiAuthToken> RetrieveAuthToken(string id)
     {
       using var response = await _httpClient.GetAsync($"/v2.2/auth/tokens/{id}");
+
+      CheckForErrors(response);
+
       if (response.StatusCode != HttpStatusCode.OK)
+      {
+        var responseBody = await response.Content.ReadAsStringAsync();
         throw new ScaniiException(
-          $"Invalid HTTP response from service, code: {response.StatusCode} message: {response.Content.ReadAsStringAsync()}");
+          $"Invalid HTTP response from service, code: {response.StatusCode} message: {responseBody}");
+      }
 
       return DecorateEntity(
         await JsonSerializer.DeserializeAsync<ScaniiAuthToken>(await response.Content.ReadAsStreamAsync()),
         response);
+    }
+
+    private static void CheckForErrors(HttpResponseMessage response)
+    {
+      if (response.StatusCode == HttpStatusCode.Unauthorized)
+        throw new ScaniiAuthException("Invalid credentials — check your API key and secret.");
+
+      if (response.StatusCode == (HttpStatusCode)429)
+        throw new ScaniiRateLimitException("Rate limit exceeded. Check the Retry-After header.");
     }
 
     private void ConfigureClient(ScaniiTarget target, string key, string secret)
@@ -192,7 +216,7 @@ namespace UvaSoftware.Scanii.Internal
       _httpClient.DefaultRequestHeaders.Add("Authorization",
         "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes($"{key}:{secret}")));
 
-      _logger.LogInformation("starting client with version {Version} and target {@Target}", version, target);
+      Trace.WriteLine($"[scanii] client initialized version={version} endpoint={target.Endpoint}");
     }
 
     private static T DecorateEntity<T>(T entity, HttpResponseMessage response) where T : ScaniiResult

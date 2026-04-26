@@ -1,4 +1,4 @@
-﻿namespace UvaSoftware.Scanii.Internal
+namespace Scanii.Internal
 {
   public static class HttpHeaders
   {

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 // ReSharper disable CollectionNeverUpdated.Global
 
-namespace UvaSoftware.Scanii.Entities
+namespace Scanii.Models
 {
   public class ScaniiProcessingResult : ScaniiResult
   {

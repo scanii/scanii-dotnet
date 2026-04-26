@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace UvaSoftware.Scanii.Entities
+namespace Scanii.Models
 {
   public class ScaniiPendingResult : ScaniiResult
   {

@@ -1,41 +1,101 @@
-### Dotnet client for the https://scanii.com content processing service
+# scanii-dotnet
 
-### How to use this client
+.NET client for the [Scanii](https://scanii.com) content processing API.
 
-This library is installable via Nuget and can be installed via the usual tools, details here: https://www.nuget.org/packages/UvaSoftware.Scanii/
+## Installation
 
-For example, using the dotnet CLI: 
 ```
-dotnet add package UvaSoftware.Scanii --version $LATEST_VERSION
+dotnet add package Scanii --version 7.0.0
 ```
 
-### Basic usage:
- 
-```c#
-using System;
-using System.Threading.Tasks;
-using UvaSoftware.Scanii;
+## SDK Principles
 
-namespace Acme
+1. **Light.** Zero runtime dependencies, stdlib only.
+2. **Up to date.** Always current with the latest Scanii API.
+3. **Integration-only.** Wraps the REST API — retries, concurrency, and batching are the caller's responsibility.
+
+## Quickstart
+
+```csharp
+using Scanii;
+
+var client = ScaniiClients.CreateDefault("your-api-key", "your-api-secret");
+var result = await client.Process("/path/to/file.pdf");
+if (result.Findings.Count == 0)
+    Console.WriteLine("Content is safe!");
+else
+    Console.WriteLine($"Findings: {string.Join(", ", result.Findings)}");
+```
+
+## API Reference
+
+Full API documentation: <https://scanii.github.io/openapi/v22/>
+
+All methods are on `IScaniiClient`, created via `ScaniiClients.CreateDefault`.
+
+| Method | Description |
+|---|---|
+| `Process(path/stream, callback?, metadata?)` | Synchronous file scan |
+| `ProcessAsync(path/stream, callback?, metadata?)` | Server-side async scan, returns pending result |
+| `Fetch(url, callback?, metadata?)` | Server-side fetch-and-scan of a remote URL |
+| `Retrieve(id)` | Retrieve a previous scan result |
+| `CreateAuthToken(timeoutSeconds)` | Mint a short-lived auth token |
+| `RetrieveAuthToken(id)` | Inspect an auth token |
+| `DeleteAuthToken(id)` | Revoke an auth token |
+| `Ping()` | Health check |
+
+## Regional Endpoints
+
+```csharp
+// Default (auto-routed)
+var client = ScaniiClients.CreateDefault(key, secret);
+
+// Regional
+var client = ScaniiClients.CreateDefault(key, secret, target: ScaniiTarget.Eu1);
+```
+
+| Target | Endpoint |
+|---|---|
+| `ScaniiTarget.Auto` | `https://api.scanii.com` |
+| `ScaniiTarget.Us1` | `https://api-us1.scanii.com` |
+| `ScaniiTarget.Ca1` | `https://api-ca1.scanii.com` |
+| `ScaniiTarget.Eu1` | `https://api-eu1.scanii.com` |
+| `ScaniiTarget.Eu2` | `https://api-eu2.scanii.com` |
+| `ScaniiTarget.Ap1` | `https://api-ap1.scanii.com` |
+| `ScaniiTarget.Ap2` | `https://api-ap2.scanii.com` |
+
+## Error Handling
+
+```csharp
+try
 {
-  public class Sample
-  {
-    static async Task Main(string[] args)
-    {
-      var client = ScaniiClients.CreateDefault(args[0], args[1]);
-      var result = await client.Process("C:\foo.doc");
-      
-      if (r.Findings.Count == 0)
-      {
-        Console.WriteLine("Content is safe!")
-      }
-    }  
-  }
+    var result = await client.Process("/path/to/file");
+}
+catch (ScaniiAuthException)
+{
+    // HTTP 401 — bad credentials
+}
+catch (ScaniiRateLimitException)
+{
+    // HTTP 429 — rate limit hit
+}
+catch (ScaniiException ex)
+{
+    // other API errors
 }
 ```
 
-Please note that you will need a valid scanii.com account and API Credentials. 
+## Local Testing with scanii-cli
 
-More advanced usage examples can be found [here](https://github.com/uvasoftware/scanii-dotnet/blob/master/UvaSoftware.Scanii.Tests/ScaniiClientTests.cs)
+```bash
+docker run -d --name scanii-cli -p 4000:4000 ghcr.io/scanii/scanii-cli:latest server
+```
 
-General documentation on scanii can be found [here](http://docs.scanii.com)
+```csharp
+var client = ScaniiClients.CreateDefault("key", "secret",
+    target: new ScaniiTarget("http://localhost:4000"));
+```
+
+## License
+
+Apache 2.0. See [LICENSE](LICENSE).

@@ -1,8 +1,8 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UvaSoftware.Scanii", "UvaSoftware.Scanii\UvaSoftware.Scanii.csproj", "{4D9A25AD-BB2F-4AB4-A9B8-EA8ACBFBD3EA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scanii", "Scanii\Scanii.csproj", "{4D9A25AD-BB2F-4AB4-A9B8-EA8ACBFBD3EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UvaSoftware.Scanii.Tests", "UvaSoftware.Scanii.Tests\UvaSoftware.Scanii.Tests.csproj", "{6A69F093-7C2F-4FE5-B442-ACCFDA6D3E75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scanii.Tests", "Scanii.Tests\Scanii.Tests.csproj", "{6A69F093-7C2F-4FE5-B442-ACCFDA6D3E75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

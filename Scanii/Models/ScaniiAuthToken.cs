@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace UvaSoftware.Scanii.Entities
+namespace Scanii.Models
 {
   public class ScaniiAuthToken : ScaniiResult
   {
