@@ -104,5 +104,26 @@ namespace Scanii
     /// <returns>the auth token</returns>
     /// <exception cref="ScaniiException"></exception>
     Task<ScaniiAuthToken> RetrieveAuthToken(string id);
+
+    /// <summary>
+    ///   Retrieves the processing event trace for a previously scanned file (https://scanii.github.io/openapi/v22/).
+    ///   This is preview surface in the v2.2 API — behavior may change in future releases.
+    /// </summary>
+    /// <param name="id">id of the previously scanned content</param>
+    /// <returns>trace result, or null if the id is not found (404)</returns>
+    /// <exception cref="ScaniiException"></exception>
+    Task<ScaniiTraceResult> RetrieveTrace(string id);
+
+    /// <summary>
+    ///   Submits a remote URL for synchronous processing (https://scanii.github.io/openapi/v22/).
+    ///   This is preview surface in the v2.2 API — behavior may change in future releases.
+    /// </summary>
+    /// <param name="location">URL of the content to be processed</param>
+    /// <param name="callback">optional location (URL) to be notified and receive the result</param>
+    /// <param name="metadata">optional metadata to be added to this analysis</param>
+    /// <returns>processing result</returns>
+    /// <exception cref="ScaniiException"></exception>
+    Task<ScaniiProcessingResult> ProcessFromUrl(string location, string callback = null,
+      Dictionary<string, string> metadata = null);
   }
 }

@@ -29,7 +29,7 @@ namespace Scanii.Internal
     public async Task<ScaniiProcessingResult> Process(Stream contents, string callback = null,
       Dictionary<string, string> metadata = null)
     {
-      var formDataContent = new MultipartFormDataContent {{new StreamContent(contents), "file"}};
+      var formDataContent = new MultipartFormDataContent { { new StreamContent(contents), "file" } };
 
       if (metadata != null)
         foreach (var keyValuePair in metadata)
@@ -61,7 +61,7 @@ namespace Scanii.Internal
     public async Task<ScaniiPendingResult> ProcessAsync(Stream contents, string callback = null,
       Dictionary<string, string> metadata = null)
     {
-      var req = new MultipartFormDataContent {{new StreamContent(contents), "file"}};
+      var req = new MultipartFormDataContent { { new StreamContent(contents), "file" } };
 
       if (metadata != null)
         foreach (var keyValuePair in metadata)
@@ -125,7 +125,7 @@ namespace Scanii.Internal
     {
       if (location == null) throw new ArgumentNullException(nameof(location));
 
-      var parameters = new Dictionary<string, string> {{"location", location}};
+      var parameters = new Dictionary<string, string> { { "location", location } };
 
       if (callback != null) parameters.Add("callback", callback);
 
@@ -150,7 +150,7 @@ namespace Scanii.Internal
 
     public async Task<ScaniiAuthToken> CreateAuthToken(int timeoutInSeconds = 300)
     {
-      var parameters = new Dictionary<string, string> {{"timeout", timeoutInSeconds.ToString()}};
+      var parameters = new Dictionary<string, string> { { "timeout", timeoutInSeconds.ToString() } };
 
       var req = new FormUrlEncodedContent(parameters);
       using var response = await _httpClient.PostAsync("/v2.2/auth/tokens", req);
@@ -196,6 +196,55 @@ namespace Scanii.Internal
       return DecorateEntity(
         await JsonSerializer.DeserializeAsync<ScaniiAuthToken>(await response.Content.ReadAsStreamAsync()),
         response);
+    }
+
+    public async Task<ScaniiTraceResult> RetrieveTrace(string id)
+    {
+      using var response = await _httpClient.GetAsync($"/v2.2/files/{id}/trace");
+      Trace.WriteLine($"[scanii] GET /v2.2/files/{id}/trace status={response.StatusCode}");
+
+      if (response.StatusCode == HttpStatusCode.NotFound) return null;
+
+      CheckForErrors(response);
+
+      if (response.StatusCode != HttpStatusCode.OK)
+      {
+        var responseBody = await response.Content.ReadAsStringAsync();
+        throw new ScaniiException(
+          $"Invalid HTTP response from service, code: {response.StatusCode} message: {responseBody}");
+      }
+
+      return DecorateEntity(
+        await JsonSerializer.DeserializeAsync<ScaniiTraceResult>(await response.Content.ReadAsStreamAsync()),
+        response);
+    }
+
+    public async Task<ScaniiProcessingResult> ProcessFromUrl(string location, string callback = null,
+      Dictionary<string, string> metadata = null)
+    {
+      if (location == null) throw new ArgumentNullException(nameof(location));
+
+      var formDataContent = new MultipartFormDataContent { { new StringContent(location), "location" } };
+
+      if (callback != null) formDataContent.Add(new StringContent(callback), "callback");
+
+      if (metadata != null)
+        foreach (var keyValuePair in metadata)
+          formDataContent.Add(new StringContent(keyValuePair.Value), $"metadata[{keyValuePair.Key}]");
+
+      using var response = await _httpClient.PostAsync("/v2.2/files", formDataContent);
+      Trace.WriteLine($"[scanii] POST /v2.2/files (from-url) status={response.StatusCode}");
+
+      CheckForErrors(response);
+
+      if (response.StatusCode == HttpStatusCode.Created)
+        return DecorateEntity(
+          await JsonSerializer.DeserializeAsync<ScaniiProcessingResult>(await response.Content.ReadAsStreamAsync()),
+          response);
+
+      var responseBody = await response.Content.ReadAsStringAsync();
+      throw new ScaniiException(
+        $"Invalid HTTP response from service, code: {response.StatusCode} message: {responseBody}");
     }
 
     private static void CheckForErrors(HttpResponseMessage response)

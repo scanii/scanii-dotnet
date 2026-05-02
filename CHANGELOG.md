@@ -1,3 +1,8 @@
+## [7.1.0]
+
+* Added `RetrieveTrace(id)` — retrieves the processing event trace for a previously scanned file (`GET /v2.2/files/{id}/trace`); returns `null` on 404. Preview surface per the v2.2 API spec.
+* Added `ProcessFromUrl(location, callback?, metadata?)` — synchronous scan of a remote URL (`POST /v2.2/files` with `location` form field). Preview surface per the v2.2 API spec.
+
 ## 7.0.0
 
 * **Breaking:** NuGet package renamed from `UvaSoftware.Scanii` to `Scanii`. Install: `dotnet add package Scanii`
