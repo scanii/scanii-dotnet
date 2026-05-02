@@ -198,7 +198,7 @@ namespace Scanii.Tests
     {
       var r = await _client.Fetch(
         "https://scanii.s3.amazonaws.com/eicarcom2.zip",
-        metadata: new Dictionary<string, string> {{"hello", "world"}});
+        metadata: new Dictionary<string, string> { { "hello", "world" } });
 
       Assert.That(r.ResourceId, Is.Not.Null);
 
@@ -216,6 +216,38 @@ namespace Scanii.Tests
 
       Assert.ThrowsAsync<ScaniiAuthException>(async () =>
         await badClient.Process(_cleanFile));
+    }
+
+    [Test]
+    public async Task ShouldRetrieveTraceForKnownId()
+    {
+      var processed = await _client.Process(_cleanFile);
+      var trace = await _client.RetrieveTrace(processed.ResourceId);
+
+      Assert.That(trace, Is.Not.Null);
+      Assert.That(trace.Events, Is.Not.Empty);
+      foreach (var ev in trace.Events)
+      {
+        Assert.That(ev.Timestamp, Is.Not.EqualTo(default(DateTime)));
+        Assert.That(ev.Message, Is.Not.Null);
+      }
+    }
+
+    [Test]
+    public async Task ShouldReturnNullForUnknownTraceId()
+    {
+      var result = await _client.RetrieveTrace("does-not-exist-00000000");
+      Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task ShouldProcessFromUrl()
+    {
+      var r = await _client.ProcessFromUrl($"{Endpoint}/static/eicar.txt");
+
+      Assert.That(r, Is.Not.Null);
+      Assert.That(r.ResourceId, Is.Not.Null);
+      Assert.That(r.Findings, Contains.Item("content.malicious.eicar-test-signature"));
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace Scanii.Models
+namespace Scanii.Models
 {
   public class ScaniiResult
   {
