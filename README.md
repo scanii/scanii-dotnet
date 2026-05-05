@@ -5,7 +5,7 @@
 ## Installation
 
 ```
-dotnet add package Scanii --version 7.1.0
+dotnet add package Scanii --version 7.2.0
 ```
 
 ## SDK Principles
@@ -19,7 +19,7 @@ dotnet add package Scanii --version 7.1.0
 ```csharp
 using Scanii;
 
-var client = ScaniiClients.CreateDefault("your-api-key", "your-api-secret");
+var client = ScaniiClients.CreateDefault(ScaniiTarget.Us1, "your-api-key", "your-api-secret");
 var result = await client.Process("/path/to/file.pdf");
 if (result.Findings.Count == 0)
     Console.WriteLine("Content is safe!");
@@ -49,22 +49,18 @@ All methods are on `IScaniiClient`, created via `ScaniiClients.CreateDefault`.
 ## Regional Endpoints
 
 ```csharp
-// Default (auto-routed)
-var client = ScaniiClients.CreateDefault(key, secret);
-
-// Regional
-var client = ScaniiClients.CreateDefault(key, secret, target: ScaniiTarget.Eu1);
+var client = ScaniiClients.CreateDefault(ScaniiTarget.Eu1, key, secret);
 ```
 
 | Target | Endpoint |
 |---|---|
-| `ScaniiTarget.Auto` | `https://api.scanii.com` |
 | `ScaniiTarget.Us1` | `https://api-us1.scanii.com` |
 | `ScaniiTarget.Ca1` | `https://api-ca1.scanii.com` |
 | `ScaniiTarget.Eu1` | `https://api-eu1.scanii.com` |
 | `ScaniiTarget.Eu2` | `https://api-eu2.scanii.com` |
 | `ScaniiTarget.Ap1` | `https://api-ap1.scanii.com` |
 | `ScaniiTarget.Ap2` | `https://api-ap2.scanii.com` |
+| ~~`ScaniiTarget.Auto`~~ | ~~`https://api.scanii.com`~~ — **deprecated**, does not guarantee regional data placement |
 
 ## Error Handling
 

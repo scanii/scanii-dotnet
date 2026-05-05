@@ -1,3 +1,7 @@
+## [7.2.0]
+
+* `ScaniiTarget.Auto` marked `[Obsolete]` — use an explicit regional target (`Us1`, `Eu1`, `Eu2`, `Ap1`, `Ap2`, `Ca1`) for data residency compliance. Will be removed in a future major version.
+
 ## [7.1.0]
 
 * Added `RetrieveTrace(id)` — retrieves the processing event trace for a previously scanned file (`GET /v2.2/files/{id}/trace`); returns `null` on 404. Preview surface per the v2.2 API spec.
