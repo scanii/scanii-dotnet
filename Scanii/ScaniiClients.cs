@@ -7,6 +7,7 @@ namespace Scanii
 {
   public static class ScaniiClients
   {
+#pragma warning disable CS0618 // ScaniiTarget.Auto is deprecated — intentional backward-compat default
     public static IScaniiClient CreateDefault(string key, string secret,
       HttpClient client = null, ScaniiTarget target = null)
     {
@@ -28,5 +29,6 @@ namespace Scanii
       target ??= ScaniiTarget.Auto;
       return new DefaultScaniiClient(target, authToken.ResourceId, "", client);
     }
+#pragma warning restore CS0618
   }
 }

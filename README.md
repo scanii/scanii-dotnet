@@ -5,7 +5,7 @@
 ## Installation
 
 ```
-dotnet add package Scanii --version 7.1.0
+dotnet add package Scanii --version 7.2.0
 ```
 
 ## SDK Principles
