@@ -214,8 +214,8 @@ namespace Scanii.Tests
       var badClient = ScaniiClients.CreateDefault("bad-key", "bad-secret",
         new HttpClient(), new ScaniiTarget(Endpoint));
 
-      Assert.ThrowsAsync<ScaniiAuthException>(async () =>
-        await badClient.Process(_cleanFile));
+      Assert.ThrowsAsync<ScaniiAuthException>((AsyncTestDelegate)(async () =>
+        await badClient.Process(_cleanFile)));
     }
 
     [Test]
