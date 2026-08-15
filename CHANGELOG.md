@@ -1,4 +1,4 @@
-## [7.3.0]
+## [7.2.1]
 
 * Bumped test dependencies: NUnit 4.3.2 → 4.6.1, NUnit3TestAdapter 4.6.0 → 6.2.0, Microsoft.NET.Test.Sdk 17.14.1 → 18.9.0, Serilog 4.3.1 → 4.4.0, Serilog.Extensions.Logging 9.0.2 → 10.0.0, Microsoft.Extensions.Logging.Abstractions 9.0.17 → 10.0.11. No runtime dependencies — the published package is unchanged.
 * Bumped CI action: `actions/setup-dotnet` v5 → v6.
