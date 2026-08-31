@@ -247,6 +247,50 @@ namespace Scanii.Internal
         $"Invalid HTTP response from service, code: {response.StatusCode} message: {responseBody}");
     }
 
+    public async Task<bool> Delete(string id)
+    {
+      if (id == null) throw new ArgumentNullException(nameof(id));
+
+      using var response = await _httpClient.DeleteAsync($"/v2.2/files/{id}");
+      Trace.WriteLine($"[scanii] DELETE /v2.2/files/{id} status={response.StatusCode}");
+
+      if (response.StatusCode == HttpStatusCode.NotFound)
+      {
+        var body = await response.Content.ReadAsStringAsync();
+        throw new ScaniiException($"Result not found: {id} — {body}");
+      }
+
+      CheckForErrors(response);
+
+      if (response.StatusCode == HttpStatusCode.NoContent) return true;
+
+      var responseBody = await response.Content.ReadAsStringAsync();
+      throw new ScaniiException(
+        $"Invalid HTTP response from service, code: {response.StatusCode} message: {responseBody}");
+    }
+
+    public async Task<bool> DeleteTrace(string id)
+    {
+      if (id == null) throw new ArgumentNullException(nameof(id));
+
+      using var response = await _httpClient.DeleteAsync($"/v2.2/files/{id}/trace");
+      Trace.WriteLine($"[scanii] DELETE /v2.2/files/{id}/trace status={response.StatusCode}");
+
+      if (response.StatusCode == HttpStatusCode.NotFound)
+      {
+        var body = await response.Content.ReadAsStringAsync();
+        throw new ScaniiException($"Trace not found: {id} — {body}");
+      }
+
+      CheckForErrors(response);
+
+      if (response.StatusCode == HttpStatusCode.NoContent) return true;
+
+      var responseBody = await response.Content.ReadAsStringAsync();
+      throw new ScaniiException(
+        $"Invalid HTTP response from service, code: {response.StatusCode} message: {responseBody}");
+    }
+
     private static void CheckForErrors(HttpResponseMessage response)
     {
       if (response.StatusCode == HttpStatusCode.Unauthorized)

@@ -125,5 +125,22 @@ namespace Scanii
     /// <exception cref="ScaniiException"></exception>
     Task<ScaniiProcessingResult> ProcessFromUrl(string location, string callback = null,
       Dictionary<string, string> metadata = null);
+
+    /// <summary>
+    ///   Deletes the processing result for a previously scanned file (DELETE /v2.2/files/{id}).
+    ///   The trace is left intact and can still be retrieved via RetrieveTrace.
+    /// </summary>
+    /// <param name="id">id of the processing result to delete</param>
+    /// <returns>true if the result was deleted (HTTP 204)</returns>
+    /// <exception cref="ScaniiException">thrown when the id is not found (HTTP 404) or another error occurs</exception>
+    Task<bool> Delete(string id);
+
+    /// <summary>
+    ///   Deletes the processing event trace for a previously scanned file (DELETE /v2.2/files/{id}/trace).
+    /// </summary>
+    /// <param name="id">id of the trace to delete</param>
+    /// <returns>true if the trace was deleted (HTTP 204)</returns>
+    /// <exception cref="ScaniiException">thrown when the id is not found (HTTP 404) or another error occurs</exception>
+    Task<bool> DeleteTrace(string id);
   }
 }
