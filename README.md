@@ -37,11 +37,11 @@ All methods are on `IScaniiClient`, created via `ScaniiClients.CreateDefault`.
 |---|---|
 | `Process(path/stream, callback?, metadata?)` | Synchronous file scan |
 | `ProcessAsync(path/stream, callback?, metadata?)` | Server-side async scan, returns pending result |
-| `ProcessFromUrl(url, callback?, metadata?)` | Synchronous scan of a remote URL (v2.2 preview) |
+| `ProcessFromUrl(url, callback?, metadata?)` | Synchronous scan of a remote URL |
 | `Fetch(url, callback?, metadata?)` | Server-side fetch-and-scan of a remote URL |
 | `Retrieve(id)` | Retrieve a previous scan result |
 | `Delete(id)` | Delete a processing result; trace is preserved (204 on success, throws on 404) |
-| `RetrieveTrace(id)` | Retrieve processing event trace; returns `null` on 404 (v2.2 preview) |
+| `RetrieveTrace(id)` | Retrieve processing event trace; returns `null` on 404 |
 | `DeleteTrace(id)` | Delete the processing event trace (204 on success, throws on 404) |
 | `CreateAuthToken(timeoutSeconds)` | Mint a short-lived auth token |
 | `RetrieveAuthToken(id)` | Inspect an auth token |
