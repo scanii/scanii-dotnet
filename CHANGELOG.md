@@ -1,3 +1,9 @@
+## [7.3.0]
+
+* Added `Delete(id)` — deletes the processing result for a previously scanned file (`DELETE /v2.2/files/{id}`); the trace is preserved. Returns `true` on HTTP 204, throws `ScaniiException` on 404.
+* Added `DeleteTrace(id)` — deletes the processing event trace for a previously scanned file (`DELETE /v2.2/files/{id}/trace`). Returns `true` on HTTP 204, throws `ScaniiException` on 404.
+* Added integration tests: result deletion, trace-remains-after-result-deletion, trace deletion, and unknown-ID error behavior.
+
 ## [7.2.1]
 
 * Bumped test dependencies: NUnit 4.3.2 → 4.6.1, NUnit3TestAdapter 4.6.0 → 6.2.0, Microsoft.NET.Test.Sdk 17.14.1 → 18.9.0, Serilog 4.3.1 → 4.4.0, Serilog.Extensions.Logging 9.0.2 → 10.0.0, Microsoft.Extensions.Logging.Abstractions 9.0.17 → 10.0.11. No runtime dependencies — the published package is unchanged.

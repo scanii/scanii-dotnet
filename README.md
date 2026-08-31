@@ -5,7 +5,7 @@
 ## Installation
 
 ```
-dotnet add package Scanii --version 7.2.1
+dotnet add package Scanii --version 7.3.0
 ```
 
 ## SDK Principles
@@ -40,7 +40,9 @@ All methods are on `IScaniiClient`, created via `ScaniiClients.CreateDefault`.
 | `ProcessFromUrl(url, callback?, metadata?)` | Synchronous scan of a remote URL (v2.2 preview) |
 | `Fetch(url, callback?, metadata?)` | Server-side fetch-and-scan of a remote URL |
 | `Retrieve(id)` | Retrieve a previous scan result |
+| `Delete(id)` | Delete a processing result; trace is preserved (204 on success, throws on 404) |
 | `RetrieveTrace(id)` | Retrieve processing event trace; returns `null` on 404 (v2.2 preview) |
+| `DeleteTrace(id)` | Delete the processing event trace (204 on success, throws on 404) |
 | `CreateAuthToken(timeoutSeconds)` | Mint a short-lived auth token |
 | `RetrieveAuthToken(id)` | Inspect an auth token |
 | `DeleteAuthToken(id)` | Revoke an auth token |

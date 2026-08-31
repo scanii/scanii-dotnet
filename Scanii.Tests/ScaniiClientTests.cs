@@ -250,6 +250,54 @@ namespace Scanii.Tests
       Assert.That(r.Findings, Contains.Item("content.malicious.eicar-test-signature"));
     }
 
+    [Test]
+    public async Task ShouldDeleteProcessingResult()
+    {
+      var processed = await _client.Process(_cleanFile);
+      Assert.That(processed.ResourceId, Is.Not.Null);
+
+      var deleted = await _client.Delete(processed.ResourceId);
+      Assert.That(deleted, Is.True);
+    }
+
+    [Test]
+    public async Task ShouldLeaveTraceIntactAfterDeletingResult()
+    {
+      var processed = await _client.Process(_cleanFile);
+      Assert.That(processed.ResourceId, Is.Not.Null);
+
+      await _client.Delete(processed.ResourceId);
+
+      // trace must still be retrievable after the result is deleted
+      var trace = await _client.RetrieveTrace(processed.ResourceId);
+      Assert.That(trace, Is.Not.Null);
+      Assert.That(trace.Events, Is.Not.Empty);
+    }
+
+    [Test]
+    public async Task ShouldDeleteTrace()
+    {
+      var processed = await _client.Process(_cleanFile);
+      Assert.That(processed.ResourceId, Is.Not.Null);
+
+      var deleted = await _client.DeleteTrace(processed.ResourceId);
+      Assert.That(deleted, Is.True);
+    }
+
+    [Test]
+    public void ShouldThrowOnDeleteUnknownId()
+    {
+      Assert.ThrowsAsync<ScaniiException>((Func<Task>)(async () =>
+        await _client.Delete("does-not-exist-00000000")));
+    }
+
+    [Test]
+    public void ShouldThrowOnDeleteTraceUnknownId()
+    {
+      Assert.ThrowsAsync<ScaniiException>((Func<Task>)(async () =>
+        await _client.DeleteTrace("does-not-exist-00000000")));
+    }
+
     /// <summary>
     /// TODO: callback integration test — requires scanii-cli callback support.
     /// Once scanii-cli ships callback simulation, implement this test by spinning
