@@ -1,3 +1,7 @@
+## [Unreleased]
+
+* Dropped the "v2.2 preview" designation from `RetrieveTrace` and `ProcessFromUrl`. The trace endpoint is no longer marked preview in the contract, and `ProcessFromUrl` was never preview; the methods themselves are unchanged.
+
 ## [7.3.1]
 
 * Added `Delete(id)` — deletes the processing result for a previously scanned file (`DELETE /v2.2/files/{id}`); the trace is preserved. Returns `true` on HTTP 204, throws `ScaniiException` on 404.
