@@ -1,4 +1,4 @@
-## [7.3.0]
+## [7.3.1]
 
 * Added `Delete(id)` — deletes the processing result for a previously scanned file (`DELETE /v2.2/files/{id}`); the trace is preserved. Returns `true` on HTTP 204, throws `ScaniiException` on 404.
 * Added `DeleteTrace(id)` — deletes the processing event trace for a previously scanned file (`DELETE /v2.2/files/{id}/trace`). Returns `true` on HTTP 204, throws `ScaniiException` on 404.
