@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+### Changed
+
 * Dropped the "v2.2 preview" designation from `RetrieveTrace` and `ProcessFromUrl`. The trace endpoint is no longer marked preview in the contract, and `ProcessFromUrl` was never preview; the methods themselves are unchanged.
 
 ## [7.3.1]
@@ -22,7 +24,7 @@
 * Added `RetrieveTrace(id)` — retrieves the processing event trace for a previously scanned file (`GET /v2.2/files/{id}/trace`); returns `null` on 404. Preview surface per the v2.2 API spec.
 * Added `ProcessFromUrl(location, callback?, metadata?)` — synchronous scan of a remote URL (`POST /v2.2/files` with `location` form field). Preview surface per the v2.2 API spec.
 
-## 7.0.0
+## [7.0.0]
 
 * **Breaking:** NuGet package renamed from `UvaSoftware.Scanii` to `Scanii`. Install: `dotnet add package Scanii`
 * **Breaking:** Root namespace renamed from `UvaSoftware.Scanii` to `Scanii`
@@ -53,7 +55,7 @@ using Scanii;
 using Scanii.Models;
 ```
 
-## v4.0.2
+## [4.0.2]
 * Dropped RestSharp in favor of native HttpClient and made HttpClient configurable
 * Dropped Serilog in favor of MS.Extensions.Logging.Abstraction (https://github.com/uvasoftware/scanii-dotnet/issues/17)
 * Extracted main class into an interface IScaniiClient
