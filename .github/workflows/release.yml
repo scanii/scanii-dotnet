@@ -1,22 +1,64 @@
 name: Release
 
+# Publishes to NuGet with trusted publishing: NuGet/login trades the job's GitHub OIDC token for a
+# short-lived API key, under the nuget.org policy for this repository, this file and the "nuget"
+# environment. There is no stored API key to expire or go missing.
+#
+# A published release runs it. To publish an existing tag again (one whose publish failed), run it
+# from the default branch with that tag:
+#   gh workflow run release.yml -R scanii/scanii-dotnet --ref main -f tag=v7.3.2
+
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "An existing release tag to publish, e.g. v7.3.2"
+        required: true
+
+permissions: {}
 
 jobs:
   publish:
     name: Publish to NuGet
     runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ github.event.release.tag_name || inputs.tag }}
+          persist-credentials: false
 
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "8.0.x"
 
+      # The package must carry the tag's version, or the push would publish the wrong one.
+      - name: Check the version matches the tag
+        env:
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          VERSION=$(grep -oPm1 '(?<=<Version>)[^<]+' Scanii/Scanii.csproj)
+          echo "tag=$TAG csproj=$VERSION"
+          if [ "v$VERSION" != "$TAG" ]; then
+            echo "::error::Scanii/Scanii.csproj says $VERSION, not the tag $TAG"
+            exit 1
+          fi
+
       - name: dotnet pack
         run: dotnet pack Scanii/Scanii.csproj --configuration Release --output nupkgs
 
+      - name: NuGet login (trusted publishing)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: cleverfoo # the nuget.org account that owns Scanii and its trusted publishing policy
+
       - name: dotnet nuget push
-        run: dotnet nuget push nupkgs/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push nupkgs/*.nupkg --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
