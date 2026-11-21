@@ -56,7 +56,7 @@ jobs:
         id: login
         uses: NuGet/login@v1
         with:
-          user: cleverfoo # the nuget.org account that owns Scanii and its trusted publishing policy
+          user: scanii # the nuget.org organization that owns Scanii and its trusted publishing policy
 
       - name: dotnet nuget push
         env:
