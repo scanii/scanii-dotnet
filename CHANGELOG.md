@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [7.3.2] — 2026-11-21
+
 ### Changed
 
 * Dropped the "v2.2 preview" designation from `RetrieveTrace` and `ProcessFromUrl`. The trace endpoint is no longer marked preview in the contract, and `ProcessFromUrl` was never preview; the methods themselves are unchanged.
